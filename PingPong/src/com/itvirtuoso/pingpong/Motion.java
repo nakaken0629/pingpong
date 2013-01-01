@@ -1,5 +1,5 @@
 package com.itvirtuoso.pingpong;
 
 public enum Motion {
-    FORWARD, BACK, STRAIGHT, CROSS,
+    STOP, FORWARD, BACK, STRAIGHT, CROSS,
 }
