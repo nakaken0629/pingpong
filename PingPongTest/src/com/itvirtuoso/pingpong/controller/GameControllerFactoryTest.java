@@ -1,5 +1,7 @@
 package com.itvirtuoso.pingpong.controller;
 
+import com.itvirtuoso.pingpong.ui.PaddleObserver;
+
 import junit.framework.TestCase;
 
 public class GameControllerFactoryTest extends TestCase {
