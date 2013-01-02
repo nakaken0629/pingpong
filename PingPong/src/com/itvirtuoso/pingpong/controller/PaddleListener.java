@@ -1,9 +1,13 @@
 package com.itvirtuoso.pingpong.controller;
 
 public interface PaddleListener {
-    void onHit(PaddleEvent event);
-    void onFirstBound(PaddleEvent event);
-    void onSecondBound(PaddleEvent event);
-    void onHittable(PaddleEvent event);
-    void onGoOutOfBounds(PaddleEvent event);
+    public abstract void onHit(PaddleEvent event);
+
+    public abstract void onFirstBound(PaddleEvent event);
+
+    public abstract void onSecondBound(PaddleEvent event);
+
+    public abstract void onHittable(PaddleEvent event);
+
+    public abstract void onGoOutOfBounds(PaddleEvent event);
 }

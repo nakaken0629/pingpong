@@ -1,28 +1,18 @@
 package com.itvirtuoso.pingpong.controller;
 
 import java.util.Calendar;
+import java.util.ResourceBundle.Control;
 
 import junit.framework.TestCase;
 
 import com.itvirtuoso.pingpong.model.Paddle;
 
-public class GameControllerTest extends TestCase {
+public class AbstractGameControllerTest extends TestCase {
+    class BaseGameController extends AbstractGameController {
+        /* nop */
+    }
+
     class BaseListener implements PaddleListener {
-        private Paddle paddle;
-
-        public Paddle getPaddle() {
-            return this.paddle;
-        }
-
-        protected GameController newGame() {
-            GameController controller = new GameController();
-            this.paddle = controller.newGame(this);
-            return controller;
-        }
-
-        protected void swing() {
-            paddle.swing();
-        }
 
         @Override
         public void onHit(PaddleEvent event) {
@@ -38,34 +28,49 @@ public class GameControllerTest extends TestCase {
         public void onSecondBound(PaddleEvent event) {
             /* nop */
         }
-        
+
         @Override
         public void onHittable(PaddleEvent event) {
             /* nop */
         }
-        
+
         @Override
         public void onGoOutOfBounds(PaddleEvent event) {
             /* nop */
         }
     }
-    
-    public void testゲームを開始する() throws Exception {
-        class FirstListener extends BaseListener {
-            /* nop */
+
+    public void 新しくゲームを始める() throws Exception {
+        class TestListener extends BaseListener {
+            Paddle paddle;
+
+            public void newGame() {
+                GameController controller = new BaseGameController();
+                this.paddle = controller.newGame(this);
+            }
         }
-        FirstListener listener1 = new FirstListener();
-        listener1.newGame();
-        assertNotNull("Paddleオブジェクトを取得できない", listener1.getPaddle());
+        TestListener listener = new TestListener();
+        listener.newGame();
+        assertNotNull("paddleオブジェクトを取得できない", listener.paddle);
     }
 
     public void testサーブする() throws Exception {
         class FirstListener extends BaseListener {
+            private Paddle paddle;
             private boolean isHit = false;
             private boolean isFirstBound = false;
             private boolean isSecondBound = false;
             private boolean isGoOutOfBounds = false;
 
+            public void newGame() {
+                GameController controller = new BaseGameController();
+                this.paddle = controller.newGame(this);
+            }
+            
+            public void swing() {
+
+            }
+            
             @Override
             public void onHit(PaddleEvent event) {
                 this.isHit = true;
@@ -120,6 +125,14 @@ public class GameControllerTest extends TestCase {
             private long goOutOfBoundsTime;
             private boolean isGoOutOfBounds = false;
 
+            public void newGame() {
+                GameController controller = new BaseGameController();
+            }
+            
+            public void swing() {
+                
+            }
+
             @Override
             public void onHit(PaddleEvent event) {
                 this.hitTime = Calendar.getInstance().getTimeInMillis();
@@ -134,7 +147,7 @@ public class GameControllerTest extends TestCase {
             public void onSecondBound(PaddleEvent event) {
                 this.secondBoundTime = Calendar.getInstance().getTimeInMillis();
             }
-            
+
             @Override
             public void onGoOutOfBounds(PaddleEvent event) {
                 this.goOutOfBoundsTime = Calendar.getInstance()
@@ -170,34 +183,34 @@ public class GameControllerTest extends TestCase {
             private boolean isSecondBound = false;
             private boolean isGoOutOfBounds = false;
 
-            protected void swing() {
-                System.out.println("FirstListener swing");
-                super.swing();
+            public GameController newGame() {
+                return null;
             }
             
+            protected void swing() {
+
+            }
+
             @Override
             public void onFirstBound(PaddleEvent event) {
                 if (!event.isHitter()) {
                     return;
                 }
-                System.out.println("FirstListener onFirstBound");
                 this.isFirstBound = true;
             }
-            
+
             @Override
             public void onSecondBound(PaddleEvent event) {
                 if (!event.isHitter()) {
                     return;
                 }
-                System.out.println("FirstListener onSecondBound");
                 this.isSecondBound = true;
             }
-            
+
             public void onHittable(PaddleEvent event) {
                 if (!event.isHitter()) {
                     return;
                 }
-                System.out.println("FirstListener onHittable");
             }
 
             @Override
@@ -205,7 +218,6 @@ public class GameControllerTest extends TestCase {
                 if (!event.isHitter()) {
                     return;
                 }
-                System.out.println("FirstListener onGoOutOfBounds");
                 this.isGoOutOfBounds = true;
             }
 
@@ -213,25 +225,23 @@ public class GameControllerTest extends TestCase {
         class SecondListener extends BaseListener {
             private Paddle paddle;
             private boolean isGoOutOfBounds = false;
-
+            
             void joinGame(GameController controller) {
                 this.paddle = controller.joinGame(this);
             }
-            
+
             @Override
             public void onFirstBound(PaddleEvent event) {
                 if (!event.isHitter()) {
                     return;
                 }
-                System.out.println("SecondListener onFirstBound");
             }
-            
+
             @Override
             public void onSecondBound(PaddleEvent event) {
                 if (!event.isHitter()) {
                     return;
                 }
-                System.out.println("SecondListener onSecondBound");
             }
 
             @Override
@@ -239,16 +249,14 @@ public class GameControllerTest extends TestCase {
                 if (!event.isHitter()) {
                     return;
                 }
-                System.out.println("SecondListener onHittable");
                 this.paddle.swing();
             }
-            
+
             @Override
             public void onGoOutOfBounds(PaddleEvent event) {
                 if (!event.isHitter()) {
                     return;
                 }
-                System.out.println("SecondListener onGoOutOfBounds");
                 this.isGoOutOfBounds = true;
             }
         }
