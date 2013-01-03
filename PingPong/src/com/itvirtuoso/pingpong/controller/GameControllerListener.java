@@ -1,13 +1,17 @@
 package com.itvirtuoso.pingpong.controller;
 
-public interface GameControllerListener {
-    public abstract void onHit();
+import com.itvirtuoso.pingpong.ui.PaddleObserver;
 
-    public abstract void onFirstBound();
+public interface GameControllerListener {
+    public abstract void setObserver(PaddleObserver observer);
     
-    public abstract void onSecondBound();
+    public abstract void onHit(GameControllerEvent event);
+
+    public abstract void onFirstBound(GameControllerEvent event);
     
-    public abstract void onHittable();
+    public abstract void onSecondBound(GameControllerEvent event);
     
-    public abstract void onGoOutOfBounds();
+    public abstract void onHittable(GameControllerEvent event);
+    
+    public abstract void onGoOutOfBounds(GameControllerEvent event);
 }
