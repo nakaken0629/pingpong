@@ -34,6 +34,10 @@ public class GameController implements PaddleObserver, BallObserver {
     private int listenerIndex;
     private Thread ballThread;
     private GameMode gameMode;
+    
+    public GameMode getGameMode() {
+        return this.gameMode;
+    }
 
     private void addListener(GameControllerListener listener) {
         this.listeners.add(listener);
@@ -187,5 +191,6 @@ public class GameController implements PaddleObserver, BallObserver {
             }
         };
         callListenerAsync(factory, this.listenerIndex);
+        this.gameMode = GameMode.WAIT;
     }
 }
