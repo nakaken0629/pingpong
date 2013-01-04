@@ -12,7 +12,6 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.widget.TextView;
@@ -129,14 +128,11 @@ public class PaddleActivity extends Activity implements SensorEventListener,
     public boolean onTouchEvent(MotionEvent event) {
         if (!DEBUG) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                Log.d(PaddleActivity.class.getSimpleName(), "down");
                 this.isSwing = true;
                 if (this.observer.getGameMode() == GameMode.WAIT) {
-                    Log.d(PaddleActivity.class.getSimpleName(), "service");
                     this.observer.swing(this, 500);
                 }
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                Log.d(PaddleActivity.class.getSimpleName(), "up");
                 this.isSwing = false;
             }
         }
@@ -168,8 +164,6 @@ public class PaddleActivity extends Activity implements SensorEventListener,
         if (!event.isHitter()) {
             return;
         }
-        Log.d(PaddleActivity.class.getSimpleName(),
-                "hittable = " + event.isHitter() + " isSwing = " + this.isSwing);
         if (DEBUG) {
             this.mHandler.post(new Runnable() {
 
