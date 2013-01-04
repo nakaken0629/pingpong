@@ -6,4 +6,11 @@
     android:background="@drawable/paddle1"
     tools:context=".PaddleActivity" >
 
+    <TextView
+        android:id="@+id/debugView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" />
+
 </RelativeLayout>
