@@ -1,6 +1,7 @@
 package com.itvirtuoso.pingpong.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.itvirtuoso.pingpong.ui.PaddleObserver;
 
@@ -29,19 +30,27 @@ public class GameController implements PaddleObserver, BallObserver {
     }
 
     private ArrayList<GameControllerListener> listeners = new ArrayList<GameControllerListener>();
+    private HashMap<GameControllerListener, Object> locks = new HashMap<GameControllerListener, Object>();
     private int listenerIndex;
     private Thread ballThread;
+    private GameMode gameMode;
+
+    private void addListener(GameControllerListener listener) {
+        this.listeners.add(listener);
+        this.locks.put(listener, new Object());
+    }
 
     @Override
     public void newGame(GameControllerListener listener) {
-        this.listeners.add(listener);
+        addListener(listener);
         this.listenerIndex = 0;
+        this.gameMode = GameMode.WAIT;
     }
 
     @Override
     public void joinGame(GameControllerListener listener) {
         listener.setObserver(this);
-        this.listeners.add(listener);
+        addListener(listener);
     }
 
     private void callListenerAsync(UpdaterFactory updaterFactory,
@@ -57,37 +66,40 @@ public class GameController implements PaddleObserver, BallObserver {
     }
 
     @Override
-    public void swing(GameControllerListener hitterListener) {
-        if (this.ballThread == null) {
-            swingAsService(hitterListener);
-        } else {
-            swingAsReceive(hitterListener);
+    public void swing(GameControllerListener hitterListener, long interval) {
+        synchronized (this.locks.get(hitterListener)) {
+            swingSafety(hitterListener, interval);
         }
     }
 
-    private void swingAsService(GameControllerListener hitterListener) {
-        callListenerAsync(new UpdaterFactory() {
-            @Override
-            Updater create(GameControllerListener listener,
-                    GameControllerEvent event) {
-                return new Updater(listener, event) {
-                    @Override
-                    public void run() {
-                        this.getListener().onHit(this.getEvent());
-                    }
-                };
-            }
-        }, this.listenerIndex);
+    private void swingSafety(GameControllerListener hitterListener,
+            long interval) {
+        if (!this.listeners.get(this.listenerIndex).equals(hitterListener)) {
+            /* 他人の打順であればswingは無視される */
+            return;
+        }
 
-        this.listenerIndex = (this.listenerIndex + 1) % this.listeners.size();
-        Ball ball = new Ball(this, 200);
-        this.ballThread = new Thread(ball);
-        this.ballThread.start();
+        if (this.gameMode == GameMode.WAIT) {
+            /* サービスする */
+            this.gameMode = GameMode.HIT;
+            hitBySwing(hitterListener);
+            Ball ball = new Ball(this, interval);
+            this.ballThread = new Thread(ball);
+            this.ballThread.start();
+        } else {
+            /* レシーブする */
+            if(this.gameMode != GameMode.HITTABLE) {
+                /* 状態がhittableで無ければswingは無視される */
+                return;
+            }
+            this.ballThread.interrupt();
+            hitBySwing(hitterListener);
+        }
     }
-    
-    private void swingAsReceive(GameControllerListener hitterListener) {
-        this.ballThread.interrupt();
-        callListenerAsync(new UpdaterFactory() {
+
+    private void hitBySwing(GameControllerListener hitterListener) {
+        this.gameMode = GameMode.HIT;
+        UpdaterFactory factory = new UpdaterFactory() {
             @Override
             Updater create(GameControllerListener listener,
                     GameControllerEvent event) {
@@ -98,13 +110,17 @@ public class GameController implements PaddleObserver, BallObserver {
                     }
                 };
             }
-        }, this.listenerIndex);
+        };
+        callListenerAsync(factory, this.listenerIndex);
+
+        /* 打順を次に進める */
         this.listenerIndex = (this.listenerIndex + 1) % this.listeners.size();
     }
 
     @Override
     public void onFirstBound() {
-        callListenerAsync(new UpdaterFactory() {
+        this.gameMode = GameMode.FIRST_BOUND;
+        UpdaterFactory factory = new UpdaterFactory() {
             @Override
             Updater create(GameControllerListener listener,
                     GameControllerEvent event) {
@@ -115,12 +131,14 @@ public class GameController implements PaddleObserver, BallObserver {
                     }
                 };
             }
-        }, this.listenerIndex);
+        };
+        callListenerAsync(factory, this.listenerIndex);
     }
 
     @Override
     public void onSecondBound() {
-        callListenerAsync(new UpdaterFactory() {
+        this.gameMode = GameMode.SECOND_BOUND;
+        UpdaterFactory factory = new UpdaterFactory() {
             @Override
             Updater create(GameControllerListener listener,
                     GameControllerEvent event) {
@@ -131,12 +149,14 @@ public class GameController implements PaddleObserver, BallObserver {
                     }
                 };
             }
-        }, this.listenerIndex);
+        };
+        callListenerAsync(factory, this.listenerIndex);
     }
 
     @Override
     public void onHittable() {
-        callListenerAsync(new UpdaterFactory() {
+        this.gameMode = GameMode.HITTABLE;
+        UpdaterFactory factory = new UpdaterFactory() {
             @Override
             Updater create(GameControllerListener listener,
                     GameControllerEvent event) {
@@ -147,12 +167,14 @@ public class GameController implements PaddleObserver, BallObserver {
                     }
                 };
             }
-        }, this.listenerIndex);
+        };
+        callListenerAsync(factory, this.listenerIndex);
     }
 
     @Override
     public void onGoOutOfBounds() {
-        callListenerAsync(new UpdaterFactory() {
+        this.gameMode = GameMode.GO_OUT_OF_BOUNDS;
+        UpdaterFactory factory = new UpdaterFactory() {
             @Override
             Updater create(GameControllerListener listener,
                     GameControllerEvent event) {
@@ -163,6 +185,7 @@ public class GameController implements PaddleObserver, BallObserver {
                     }
                 };
             }
-        }, this.listenerIndex);
+        };
+        callListenerAsync(factory, this.listenerIndex);
     }
 }
