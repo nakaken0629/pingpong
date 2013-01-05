@@ -53,7 +53,6 @@ public class GameController implements PaddleObserver, BallObserver {
 
     @Override
     public void joinGame(GameControllerListener listener) {
-        listener.setObserver(this);
         addListener(listener);
     }
 

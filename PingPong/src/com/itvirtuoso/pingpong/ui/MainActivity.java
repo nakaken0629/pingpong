@@ -16,6 +16,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        Button newGameButton = (Button) findViewById(R.id.newGameButton);
+        newGameButton.setOnClickListener(new NewGameButtonListener());
         Button trainingButton = (Button) findViewById(R.id.traningButton);
         trainingButton.setOnClickListener(new TraningButtonListener());
     }
@@ -26,11 +28,19 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
+    
+    class NewGameButtonListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(MainActivity.this, BluetoothServerActivity.class);
+            startActivity(intent);
+        }
+    }
 
     class TraningButtonListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(MainActivity.this, PaddleActivity.class);
+            Intent intent = new Intent(MainActivity.this, TraningActivity.class);
             startActivity(intent);
         }
     }

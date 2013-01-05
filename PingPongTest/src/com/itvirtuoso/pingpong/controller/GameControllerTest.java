@@ -8,10 +8,6 @@ import com.itvirtuoso.pingpong.ui.PaddleObserver;
 
 public class GameControllerTest extends TestCase {
     class BaseListener implements GameControllerListener {
-        @Override
-        public void setObserver(PaddleObserver observer) {
-            /* nop */
-        }
 
         @Override
         public void onHit(GameControllerEvent event) {
@@ -118,8 +114,7 @@ public class GameControllerTest extends TestCase {
                 private boolean isCallOnHittable = false;
                 private boolean isCallOnGoOutOfBounds = false;
 
-                @Override
-                public void setObserver(PaddleObserver observer) {
+                public ReceiveListener(PaddleObserver observer) {
                     this.observer = observer;
                 }
 
@@ -178,7 +173,7 @@ public class GameControllerTest extends TestCase {
             }
 
             public void onJoin() {
-                this.receiveListener = new ReceiveListener();
+                this.receiveListener = new ReceiveListener(this.observer);
                 this.observer.joinGame(this.receiveListener);
             }
 
@@ -263,8 +258,7 @@ public class GameControllerTest extends TestCase {
                 private PaddleObserver observer;
                 private boolean isCallOnHit = false;
 
-                @Override
-                public void setObserver(PaddleObserver observer) {
+                public ReceiveListener(PaddleObserver observer) {
                     this.observer = observer;
                 }
 
@@ -287,7 +281,7 @@ public class GameControllerTest extends TestCase {
             }
 
             public void onJoin() {
-                this.receiveListener = new ReceiveListener();
+                this.receiveListener = new ReceiveListener(this.observer);
                 this.observer.joinGame(this.receiveListener);
             }
         }
@@ -310,8 +304,7 @@ public class GameControllerTest extends TestCase {
             class ReceiveListener extends BaseListener {
                 private PaddleObserver observer;
 
-                @Override
-                public void setObserver(PaddleObserver observer) {
+                public ReceiveListener(PaddleObserver observer) {
                     this.observer = observer;
                 }
 
@@ -339,7 +332,7 @@ public class GameControllerTest extends TestCase {
             }
 
             public void onJoin() {
-                this.receiveListener = new ReceiveListener();
+                this.receiveListener = new ReceiveListener(this.observer);
                 this.observer.joinGame(this.receiveListener);
             }
 
@@ -388,8 +381,11 @@ public class GameControllerTest extends TestCase {
             }
         }
         for (Timing hitTiming : Timing.values()) {
-            if(hitTiming == Timing.HITTABLE) {
+            if (hitTiming == Timing.HITTABLE) {
                 continue;
+            }
+            if (hitTiming == Timing.GO_OUT_OF_BOUNDS) {
+                fail("プレー再開のインターフェイスを考えてから実装する");
             }
             long beginTime = Calendar.getInstance().getTimeInMillis();
             ServiceListener serviceListener = new ServiceListener(hitTiming);

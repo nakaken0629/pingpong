@@ -5,9 +5,12 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="16" />
-
+        android:minSdkVersion="7"
+        android:targetSdkVersion="17" />
+    
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -23,9 +26,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.itvirtuoso.pingpong.ui.PaddleActivity"
-            android:label="@string/title_activity_paddle" android:screenOrientation="portrait">
+            android:name="com.itvirtuoso.pingpong.ui.BluetoothServerActivity"
+            android:label="@string/title_activity_paddle"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.itvirtuoso.pingpong.ui.TraningActivity"
+            android:label="@string/title_activity_paddle"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
-
 </manifest>

@@ -2,6 +2,12 @@ package com.itvirtuoso.pingpong.ui;
 
 import java.util.List;
 
+import com.itvirtuoso.pingpong.R;
+import com.itvirtuoso.pingpong.controller.GameController;
+import com.itvirtuoso.pingpong.controller.GameControllerEvent;
+import com.itvirtuoso.pingpong.controller.GameControllerListener;
+import com.itvirtuoso.pingpong.controller.GameMode;
+
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
@@ -11,44 +17,35 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MotionEvent;
-import android.widget.TextView;
 
-import com.itvirtuoso.pingpong.R;
-import com.itvirtuoso.pingpong.controller.GameController;
-import com.itvirtuoso.pingpong.controller.GameControllerEvent;
-import com.itvirtuoso.pingpong.controller.GameControllerListener;
-import com.itvirtuoso.pingpong.controller.GameMode;
-
-public class PaddleActivity extends Activity implements SensorEventListener,
-        GameControllerListener {
-    private static final boolean DEBUG = true;
-    private Handler mHandler;
-    private TextView debugView;
+public abstract class PaddleActivity extends Activity implements
+        SensorEventListener, GameControllerListener {
+    private final static boolean IS_USE_TOUCH = true;
 
     private GameController observer;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private float maxAcceleration = (float) (9.8 * 2);
-    private float[] acceleration = new float[3];
     private boolean isSwing = false;
     private SoundPool soundPool;
     private int kaId;
     private int koId;
     private int whistleId;
 
-    protected void playSound(int id) {
+    private void playSound(int id) {
         this.soundPool.play(id, 1.0F, 1.0F, 0, 0, 1.0f);
+    }
+    
+    protected GameController getGameController() {
+        return this.observer;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paddle);
-        this.mHandler = new Handler();
-        this.debugView = (TextView) findViewById(R.id.debugView);
 
         this.mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensorList = this.mSensorManager
@@ -59,8 +56,6 @@ public class PaddleActivity extends Activity implements SensorEventListener,
 
         this.observer = new GameController();
         observer.newGame(this);
-        WallListener wallListener = new WallListener();
-        observer.joinGame(wallListener);
     }
 
     @Override
@@ -104,14 +99,9 @@ public class PaddleActivity extends Activity implements SensorEventListener,
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (DEBUG) {
+        if (!IS_USE_TOUCH) {
             if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER) {
                 return;
-            }
-            if (DEBUG) {
-                for (int i = 0; i < this.acceleration.length; i++) {
-                    this.acceleration[i] = event.values[i];
-                }
             }
             if (event.values[2] > this.maxAcceleration) {
                 this.isSwing = true;
@@ -126,7 +116,7 @@ public class PaddleActivity extends Activity implements SensorEventListener,
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!DEBUG) {
+        if (IS_USE_TOUCH) {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 this.isSwing = true;
                 if (this.observer.getGameMode() == GameMode.WAIT) {
@@ -137,11 +127,6 @@ public class PaddleActivity extends Activity implements SensorEventListener,
             }
         }
         return super.onTouchEvent(event);
-    }
-
-    @Override
-    public void setObserver(PaddleObserver observer) {
-        /* nop */
     }
 
     @Override
@@ -163,18 +148,6 @@ public class PaddleActivity extends Activity implements SensorEventListener,
     public void onHittable(GameControllerEvent event) {
         if (!event.isHitter()) {
             return;
-        }
-        if (DEBUG) {
-            this.mHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    PaddleActivity self = PaddleActivity.this;
-                    self.debugView.setText(String.format(
-                            "(x, y, z)=(%f, %f, %f)", self.acceleration[0],
-                            self.acceleration[1], self.acceleration[2]));
-                }
-            });
         }
         if (this.isSwing) {
             this.observer.swing(this, 500);

@@ -10,9 +10,8 @@ import com.itvirtuoso.pingpong.controller.GameControllerListener;
  */
 public class WallListener implements GameControllerListener {
     private PaddleObserver observer;
-
-    @Override
-    public void setObserver(PaddleObserver observer) {
+    
+    public WallListener(PaddleObserver observer) {
         this.observer = observer;
     }
 
