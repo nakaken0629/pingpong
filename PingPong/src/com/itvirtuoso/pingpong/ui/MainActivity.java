@@ -61,7 +61,7 @@ public class MainActivity extends Activity {
     class TraningButtonListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(MainActivity.this, TraningActivity.class);
+            Intent intent = new Intent(MainActivity.this, WallActivity.class);
             startActivity(intent);
         }
     }

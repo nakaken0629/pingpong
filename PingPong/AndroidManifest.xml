@@ -32,12 +32,12 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.itvirtuoso.pingpong.ui.TraningActivity"
+            android:name="com.itvirtuoso.pingpong.ui.SocketActivity"
             android:label="@string/title_activity_paddle"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.itvirtuoso.pingpong.ui.SocketActivity"
+            android:name="com.itvirtuoso.pingpong.ui.WallActivity"
             android:label="@string/title_activity_paddle"
             android:screenOrientation="portrait" >
         </activity>
