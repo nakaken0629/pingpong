@@ -34,6 +34,11 @@ public class GameController implements PaddleObserver, BallObserver {
     private int listenerIndex;
     private Thread ballThread;
     private GameMode gameMode;
+
+    /* TODO: コンストラクタを使えないようにする */
+//    GameController() {
+//        /* nop */
+//    }
     
     public GameMode getGameMode() {
         return this.gameMode;
@@ -190,6 +195,23 @@ public class GameController implements PaddleObserver, BallObserver {
             }
         };
         callListenerAsync(factory, this.listenerIndex);
+    }
+    
+    @Override
+    public void onServiceable() {
         this.gameMode = GameMode.WAIT;
+        UpdaterFactory factory = new UpdaterFactory() {
+            @Override
+            Updater create(GameControllerListener listener,
+                    GameControllerEvent event) {
+                return new Updater(listener, event) {
+                    @Override
+                    public void run() {
+                        this.getListener().onServiceable(this.getEvent());
+                    }
+                };
+            }
+        };
+        callListenerAsync(factory, this.listenerIndex);
     }
 }

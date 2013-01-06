@@ -33,6 +33,11 @@ public class GameControllerTest extends TestCase {
         public void onGoOutOfBounds(GameControllerEvent event) {
             /* nop */
         }
+        
+        @Override
+        public void onServiceable(GameControllerEvent event) {
+            /* nop */
+        }
     }
 
     public void testサービスをする() throws Exception {
@@ -50,7 +55,7 @@ public class GameControllerTest extends TestCase {
             }
 
             public void onSwing() {
-                this.observer.swing(this, 100);
+                this.observer.swing(this, 10);
             }
 
             @Override
@@ -95,13 +100,74 @@ public class GameControllerTest extends TestCase {
             if (currentTime - beginTime > 3000) {
                 throw new Exception("三秒待ってもサービスが終わらなかった");
             }
-            Thread.sleep(100);
+            Thread.sleep(10);
         }
         assertTrue("onHitが呼び出されなかった", listener.isCallOnHit);
         assertTrue("onFirstBoundが呼び出されなかった", listener.isCallOnFirstBound);
         assertTrue("onSecondBoundが呼び出されなかった", listener.isCallOnSecondBound);
         assertTrue("onHittableが呼び出されなかった", listener.isCallOnHittable);
         assertTrue("onGoOutOfBoundsが呼び出されなかった", listener.isCallOnGoOutOfBounds);
+    }
+
+    public void testサービスした時のイベントの呼び出し回数は一回であること() throws Exception {
+        class TestListener extends BaseListener {
+            private PaddleObserver observer;
+            private int onHitCount = 0;
+            private int onFirstBoundCound = 0;
+            private int onSecondBoundCount = 0;
+            private int onHittableCount = 0;
+            private int onGoOutOfBoundsCount = 0;
+
+            public void onCreate() {
+                this.observer = GameControllerFactory.create();
+                observer.newGame(this);
+            }
+
+            public void onSwing() {
+                this.observer.swing(this, 10);
+            }
+
+            @Override
+            public void onHit(GameControllerEvent event) {
+                this.onHitCount++;
+            }
+
+            @Override
+            public void onFirstBound(GameControllerEvent event) {
+                this.onFirstBoundCound++;
+            }
+
+            @Override
+            public void onSecondBound(GameControllerEvent event) {
+                this.onSecondBoundCount++;
+            }
+
+            @Override
+            public void onHittable(GameControllerEvent event) {
+                this.onHittableCount++;
+            }
+
+            @Override
+            public void onGoOutOfBounds(GameControllerEvent event) {
+                this.onGoOutOfBoundsCount++;
+            }
+        }
+        TestListener listener = new TestListener();
+        listener.onCreate();
+        listener.onSwing();
+        long beginTime = Calendar.getInstance().getTimeInMillis();
+        while (listener.onGoOutOfBoundsCount == 0) {
+            long currentTime = Calendar.getInstance().getTimeInMillis();
+            if (currentTime - beginTime > 3000) {
+                throw new Exception("三秒待ってもサービスが終わらなかった");
+            }
+            Thread.sleep(10);
+        }
+        assertEquals("onHitが呼び出されなかった", 1, listener.onHitCount);
+        assertEquals("onFirstBoundが呼び出されなかった", 1, listener.onFirstBoundCound);
+        assertEquals("onSecondBoundが呼び出されなかった", 1, listener.onSecondBoundCount);
+        assertEquals("onHittableが呼び出されなかった", 1, listener.onHittableCount);
+        assertEquals("onGoOutOfBoundsが呼び出されなかった", 1, listener.onGoOutOfBoundsCount);
     }
 
     public void testレシーブをする() throws Exception {
@@ -119,7 +185,7 @@ public class GameControllerTest extends TestCase {
                 }
 
                 public void onSwing() {
-                    this.observer.swing(this, 100);
+                    this.observer.swing(this, 10);
                 }
 
                 @Override
@@ -178,7 +244,7 @@ public class GameControllerTest extends TestCase {
             }
 
             public void onSwing() {
-                this.observer.swing(this, 100);
+                this.observer.swing(this, 10);
             }
 
             @Override
@@ -228,7 +294,7 @@ public class GameControllerTest extends TestCase {
             if (currentTime - beginTime > 3000) {
                 throw new Exception("三秒待ってもサービスが終わらなかった");
             }
-            Thread.sleep(100);
+            Thread.sleep(10);
         }
         /* サービス */
         assertTrue("サービス側のonHitが呼び出されなかった", serviceListener.isCallOnHit);
@@ -263,7 +329,7 @@ public class GameControllerTest extends TestCase {
                 }
 
                 public void onSwing() {
-                    this.observer.swing(this, 100);
+                    this.observer.swing(this, 10);
                 }
 
                 @Override
@@ -311,7 +377,7 @@ public class GameControllerTest extends TestCase {
                 @Override
                 public void onHittable(GameControllerEvent event) {
                     if (event.isHitter()) {
-                        this.observer.swing(this, 100);
+                        this.observer.swing(this, 10);
                     }
                 }
             }
@@ -337,7 +403,7 @@ public class GameControllerTest extends TestCase {
             }
 
             public void onSwing() {
-                this.observer.swing(this, 100);
+                this.observer.swing(this, 10);
             }
 
             @Override
@@ -346,28 +412,28 @@ public class GameControllerTest extends TestCase {
                     this.callCountOnHit++;
                 }
                 if (event.isHitter() && this.hitTiming == Timing.HIT) {
-                    this.observer.swing(this, 100);
+                    this.observer.swing(this, 10);
                 }
             }
 
             @Override
             public void onFirstBound(GameControllerEvent event) {
                 if (event.isHitter() && this.hitTiming == Timing.FIRST_BOUND) {
-                    this.observer.swing(this, 100);
+                    this.observer.swing(this, 10);
                 }
             }
 
             @Override
             public void onSecondBound(GameControllerEvent event) {
                 if (event.isHitter() && this.hitTiming == Timing.SECOND_BOUND) {
-                    this.observer.swing(this, 100);
+                    this.observer.swing(this, 10);
                 }
             }
 
             @Override
             public void onHittable(GameControllerEvent event) {
                 if (event.isHitter() && this.hitTiming == Timing.HITTABLE) {
-                    this.observer.swing(this, 100);
+                    this.observer.swing(this, 10);
                 }
             }
 
@@ -375,7 +441,7 @@ public class GameControllerTest extends TestCase {
             public void onGoOutOfBounds(GameControllerEvent event) {
                 if (event.isHitter()
                         && this.hitTiming == Timing.GO_OUT_OF_BOUNDS) {
-                    this.observer.swing(this, 100);
+                    this.observer.swing(this, 10);
                 }
                 this.isCallOnGoOutOfBounds = true;
             }
@@ -383,9 +449,6 @@ public class GameControllerTest extends TestCase {
         for (Timing hitTiming : Timing.values()) {
             if (hitTiming == Timing.HITTABLE) {
                 continue;
-            }
-            if (hitTiming == Timing.GO_OUT_OF_BOUNDS) {
-                fail("プレー再開のインターフェイスを考えてから実装する");
             }
             long beginTime = Calendar.getInstance().getTimeInMillis();
             ServiceListener serviceListener = new ServiceListener(hitTiming);
@@ -397,10 +460,14 @@ public class GameControllerTest extends TestCase {
                 if (currentTime - beginTime > 3000) {
                     throw new Exception("三秒待ってもゲームが終わらなかった");
                 }
-                Thread.sleep(100);
+                Thread.sleep(10);
             }
             assertEquals(hitTiming + "でswingして、サービスのonHitが二回呼ばれた", 1,
                     serviceListener.callCountOnHit);
         }
+    }
+    
+    public void testボールが外に出てから再びサービスできる状態になる() throws Exception {
+        fail("サービスできる状態になる実装をすること");
     }
 }

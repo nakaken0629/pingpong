@@ -1,11 +1,13 @@
 package com.itvirtuoso.pingpong.controller;
 
 interface BallObserver {
-    abstract void onFirstBound();
+    public abstract void onFirstBound();
     
-    abstract void onSecondBound();
+    public abstract void onSecondBound();
     
-    abstract void onHittable();
+    public abstract void onHittable();
     
-    abstract void onGoOutOfBounds();
+    public abstract void onGoOutOfBounds();
+    
+    public abstract void onServiceable();
 }

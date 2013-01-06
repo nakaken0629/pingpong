@@ -10,4 +10,6 @@ public interface GameControllerListener {
     public abstract void onHittable(GameControllerEvent event);
     
     public abstract void onGoOutOfBounds(GameControllerEvent event);
+    
+    public abstract void onServiceable(GameControllerEvent event);
 }

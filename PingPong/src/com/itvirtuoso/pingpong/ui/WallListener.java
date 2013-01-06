@@ -42,4 +42,9 @@ public class WallListener implements GameControllerListener {
     public void onGoOutOfBounds(GameControllerEvent event) {
         /* nop */
     }
+    
+    @Override
+    public void onServiceable(GameControllerEvent event) {
+        /* nop */
+    }
 }

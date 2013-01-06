@@ -20,6 +20,8 @@ public class MainActivity extends Activity {
         newGameButton.setOnClickListener(new NewGameButtonListener());
         Button trainingButton = (Button) findViewById(R.id.traningButton);
         trainingButton.setOnClickListener(new TraningButtonListener());
+        Button socketButton = (Button) findViewById(R.id.socketButton);
+        socketButton.setOnClickListener(new SocketButtonListener());
     }
 
     @Override
@@ -41,6 +43,14 @@ public class MainActivity extends Activity {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(MainActivity.this, TraningActivity.class);
+            startActivity(intent);
+        }
+    }
+    
+    class SocketButtonListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(MainActivity.this, SocketActivity.class);
             startActivity(intent);
         }
     }
