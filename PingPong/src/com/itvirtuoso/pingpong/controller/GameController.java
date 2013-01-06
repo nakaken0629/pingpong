@@ -40,7 +40,7 @@ public class GameController implements PaddleObserver, BallObserver {
 //        /* nop */
 //    }
     
-    public GameMode getGameMode() {
+    public final GameMode getGameMode() {
         return this.gameMode;
     }
 
@@ -50,14 +50,14 @@ public class GameController implements PaddleObserver, BallObserver {
     }
 
     @Override
-    public void newGame(GameControllerListener listener) {
+    public final void newGame(GameControllerListener listener) {
         addListener(listener);
         this.listenerIndex = 0;
         this.gameMode = GameMode.WAIT;
     }
 
     @Override
-    public void joinGame(GameControllerListener listener) {
+    public final void joinGame(GameControllerListener listener) {
         addListener(listener);
     }
 
@@ -74,7 +74,7 @@ public class GameController implements PaddleObserver, BallObserver {
     }
 
     @Override
-    public void swing(GameControllerListener hitterListener, long interval) {
+    public final void swing(GameControllerListener hitterListener, long interval) {
         synchronized (this.locks.get(hitterListener)) {
             swingSafety(hitterListener, interval);
         }
@@ -83,7 +83,7 @@ public class GameController implements PaddleObserver, BallObserver {
     private void swingSafety(GameControllerListener hitterListener,
             long interval) {
         if (!this.listeners.get(this.listenerIndex).equals(hitterListener)) {
-            /* 他人の打順であればswingは無視される */
+            /* 他人の打順であればswingを無視する */
             return;
         }
 
@@ -94,14 +94,12 @@ public class GameController implements PaddleObserver, BallObserver {
             Ball ball = new Ball(this, interval);
             this.ballThread = new Thread(ball);
             this.ballThread.start();
-        } else {
+        } else if(this.gameMode == GameMode.HITTABLE) {
             /* レシーブする */
-            if(this.gameMode != GameMode.HITTABLE) {
-                /* 状態がhittableで無ければswingは無視される */
-                return;
-            }
             this.ballThread.interrupt();
             hitBySwing(hitterListener);
+        } else {
+            /* サービスもレシーブもできなければ何もしない */
         }
     }
 
@@ -126,7 +124,7 @@ public class GameController implements PaddleObserver, BallObserver {
     }
 
     @Override
-    public void onFirstBound() {
+    public final void onFirstBound() {
         this.gameMode = GameMode.FIRST_BOUND;
         UpdaterFactory factory = new UpdaterFactory() {
             @Override
@@ -144,7 +142,7 @@ public class GameController implements PaddleObserver, BallObserver {
     }
 
     @Override
-    public void onSecondBound() {
+    public final void onSecondBound() {
         this.gameMode = GameMode.SECOND_BOUND;
         UpdaterFactory factory = new UpdaterFactory() {
             @Override
@@ -162,7 +160,7 @@ public class GameController implements PaddleObserver, BallObserver {
     }
 
     @Override
-    public void onHittable() {
+    public final void onHittable() {
         this.gameMode = GameMode.HITTABLE;
         UpdaterFactory factory = new UpdaterFactory() {
             @Override
@@ -180,7 +178,7 @@ public class GameController implements PaddleObserver, BallObserver {
     }
 
     @Override
-    public void onGoOutOfBounds() {
+    public final void onGoOutOfBounds() {
         this.gameMode = GameMode.GO_OUT_OF_BOUNDS;
         UpdaterFactory factory = new UpdaterFactory() {
             @Override
@@ -198,7 +196,7 @@ public class GameController implements PaddleObserver, BallObserver {
     }
     
     @Override
-    public void onServiceable() {
+    public final void onServiceable() {
         this.gameMode = GameMode.WAIT;
         UpdaterFactory factory = new UpdaterFactory() {
             @Override

@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
+import android.view.WindowManager;
 
 import com.itvirtuoso.pingpong.R;
 import com.itvirtuoso.pingpong.controller.GameController;
@@ -24,7 +25,7 @@ import com.itvirtuoso.pingpong.controller.GameMode;
 public abstract class PaddleActivity extends Activity implements
         SensorEventListener, GameControllerListener {
     private final static String TAG = PaddleActivity.class.getSimpleName();
-    private final static boolean IS_USE_TOUCH = true;
+    private final static boolean IS_USE_TOUCH = false;
 
     private GameController observer;
     private SensorManager mSensorManager;
@@ -40,6 +41,7 @@ public abstract class PaddleActivity extends Activity implements
         this.soundPool.play(id, 1.0F, 1.0F, 0, 0, 1.0f);
     }
     
+    /* TODO: このメソッドをなくせないかどうか検討する */
     protected GameController getGameController() {
         return this.observer;
     }
@@ -80,6 +82,7 @@ public abstract class PaddleActivity extends Activity implements
         this.kaId = this.soundPool.load(this, R.raw.ka, 1);
         this.koId = this.soundPool.load(this, R.raw.ko, 1);
         this.whistleId = this.soundPool.load(this, R.raw.whistle, 1);
+        /* TODO: 必要があればリソースをロードし終わるまで待機する */
     }
 
     @Override
@@ -133,6 +136,7 @@ public abstract class PaddleActivity extends Activity implements
 
     @Override
     public void onHit(GameControllerEvent event) {
+        Log.d(TAG, "onHit");
         playSound(this.kaId);
     }
 
@@ -144,6 +148,7 @@ public abstract class PaddleActivity extends Activity implements
 
     @Override
     public void onSecondBound(GameControllerEvent event) {
+        Log.d(TAG, "onSecondBound");
         playSound(this.koId);
     }
 
@@ -161,11 +166,13 @@ public abstract class PaddleActivity extends Activity implements
 
     @Override
     public void onGoOutOfBounds(GameControllerEvent event) {
+        Log.d(TAG, "onGoOutOgBounds");
         playSound(this.whistleId);
     }
     
     @Override
     public void onServiceable(GameControllerEvent event) {
+        Log.d(TAG, "onServiceable");
         playSound(this.whistleId);
     }
 }

@@ -4,6 +4,8 @@ public abstract class AbstractServer implements Server {
     private static final int MESSAGE_MAX_LENGTH = 10;
     private static final int MESSAGE_INDEX_KIND = 0;
     protected static final int RECEIVE_JOIN = 0;
+    protected static final int RECEIVE_SWINGING = 1;
+    protected static final int RECEIVE_SWINGED = 2;
     protected static final int RECEIVE_END = 255;
     protected static final int SEND_HIT = 0;
     protected static final int SEND_FIRST_BOUND = 1;
@@ -17,7 +19,7 @@ public abstract class AbstractServer implements Server {
     private int[] inputMessage = new int[MESSAGE_MAX_LENGTH];
     private int currentIndex = 0;
 
-    public void receiveData(int data) {
+    protected void receiveData(int data) {
         synchronized (this.inputLock) {
             receiveDataSafety(data);
         }
@@ -40,49 +42,70 @@ public abstract class AbstractServer implements Server {
         case RECEIVE_JOIN:
             receiveJoinMessage(message);
             break;
+        case RECEIVE_SWINGING:
+            receiveSwingingMessage(message);
+            break;
+        case RECEIVE_SWINGED:
+            receiveSwingedMessage(message);
+            break;
+
         default:
             /* nop */
         }
     }
 
-    protected void receiveJoinMessage(int[] message) {
-        join();
+    private void receiveJoinMessage(int[] message) {
+        onJoin();
+    }
+
+    private void receiveSwingingMessage(int[] message) {
+        onSwinging();
+    }
+    
+    private void receiveSwingedMessage(int[] message) {
+        onSwinged();
     }
 
     protected abstract void sendMessage(int[] message);
 
+    public abstract void onJoin();
+
+    public abstract void onSwinging();
+
+    public abstract void onSwinged();
+
     @Override
-    public void hit() {
+    public final void hit() {
         int[] message = { SEND_HIT, SEND_END };
         sendMessage(message);
     }
 
     @Override
-    public void firstBound() {
+    public final void firstBound() {
         int[] message = { SEND_FIRST_BOUND, SEND_END };
         sendMessage(message);
     }
 
     @Override
-    public void secondBound() {
+    public final void secondBound() {
         int[] message = { SEND_SECOND_BOUND, SEND_END };
         sendMessage(message);
     }
 
     @Override
-    public void hittable() {
+    public final void hittable() {
         int[] message = { SEND_HITTABLE, SEND_END };
         sendMessage(message);
     }
 
     @Override
-    public void goOutOfBounds() {
+    public final void goOutOfBounds() {
         int[] message = { SEND_GO_OUT_OF_BOUNDS, SEND_END };
         sendMessage(message);
     }
-    
+
     @Override
-    public void serviceable() {
+    public final void serviceable() {
         int[] message = { SEND_SERVICEABLE, SEND_END };
         sendMessage(message);
     }

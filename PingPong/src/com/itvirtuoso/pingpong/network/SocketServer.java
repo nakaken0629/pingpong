@@ -12,6 +12,11 @@ public abstract class SocketServer extends AbstractServer {
     private OutputStream outputStream;
 
     @Override
+    public void accept() {
+        /* Socketは常に準備ができているので、何もしない */
+    }
+
+    @Override
     public void run() {
         ServerSocket serverSocket = null;
         try {

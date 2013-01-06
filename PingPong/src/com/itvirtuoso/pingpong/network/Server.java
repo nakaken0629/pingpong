@@ -3,8 +3,6 @@ package com.itvirtuoso.pingpong.network;
 public interface Server extends Runnable {
     public abstract void accept();
     
-    public abstract void join();
-    
     public abstract void hit();
     
     public abstract void firstBound();

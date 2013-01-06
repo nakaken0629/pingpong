@@ -20,14 +20,19 @@ public class SocketActivity extends PaddleActivity {
     class SocketServerImpl extends SocketServer {
 
         @Override
-        public void accept() {
-            /* Socketは常に準備ができているので、何もしない */
-        }
-
-        @Override
-        public void join() {
+        public void onJoin() {
             Log.d(TAG, "join");
             SocketActivity.this.join(this);
+        }
+        
+        @Override
+        public void onSwinging() {
+            /* TODO: do implement */
+        }
+        
+        @Override
+        public void onSwinged() {
+            /* TODO: do implement */
         }
     }
 
