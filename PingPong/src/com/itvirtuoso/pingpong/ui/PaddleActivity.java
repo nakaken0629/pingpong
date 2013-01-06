@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -27,6 +28,7 @@ public abstract class PaddleActivity extends Activity implements
     private final static String TAG = PaddleActivity.class.getSimpleName();
     private final static boolean IS_USE_TOUCH = false;
 
+    private Handler handler;
     private GameController observer;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -40,7 +42,7 @@ public abstract class PaddleActivity extends Activity implements
     private void playSound(int id) {
         this.soundPool.play(id, 1.0F, 1.0F, 0, 0, 1.0f);
     }
-    
+
     /* TODO: このメソッドをなくせないかどうか検討する */
     protected GameController getGameController() {
         return this.observer;
@@ -50,6 +52,7 @@ public abstract class PaddleActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paddle);
+        this.handler = new Handler();
 
         this.mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensorList = this.mSensorManager
@@ -137,6 +140,13 @@ public abstract class PaddleActivity extends Activity implements
     @Override
     public void onHit(GameControllerEvent event) {
         Log.d(TAG, "onHit");
+        this.handler.post(new Runnable() {
+            @Override
+            public void run() {
+                getWindow().addFlags(
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        });
         playSound(this.kaId);
     }
 
@@ -167,9 +177,16 @@ public abstract class PaddleActivity extends Activity implements
     @Override
     public void onGoOutOfBounds(GameControllerEvent event) {
         Log.d(TAG, "onGoOutOgBounds");
+        this.handler.post(new Runnable() {
+            @Override
+            public void run() {
+                getWindow().clearFlags(
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        });
         playSound(this.whistleId);
     }
-    
+
     @Override
     public void onServiceable(GameControllerEvent event) {
         Log.d(TAG, "onServiceable");
